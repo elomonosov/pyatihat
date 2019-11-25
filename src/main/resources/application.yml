@@ -1,0 +1,31 @@
+server:
+  port: 4747
+
+#logging:
+#  level:
+#    ROOT: debug
+
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./lateness/db
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      javax:
+        persistence:
+          sharedCache:
+            mode: ENABLE_SELECTIVE
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        cache:
+          use_second_level_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+          missing_cache_strategy: create
