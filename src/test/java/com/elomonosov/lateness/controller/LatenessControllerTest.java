@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest(classes = LatenessApplication.class)
+@Disabled
 class LatenessControllerTest {
 
     protected MockMvc mockMvc;

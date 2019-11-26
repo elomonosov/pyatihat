@@ -1,0 +1,11 @@
+version: "3"
+services:
+  lateness:
+    image: lateness
+    ports:
+      - "4747:4747"
+    volumes:
+      - ~/data:/data
+volumes:
+  data:
+    external: true

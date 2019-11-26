@@ -1,14 +1,13 @@
-#server:
-#  port: 4747
+server:
+  port: 4747
 
 #logging:
 #  level:
 #    ROOT: debug
 
-
 spring:
   datasource:
-    url: jdbc:h2:file:./lateness/db
+    url: jdbc:h2:file:/data/lateness/db
     driverClassName: org.h2.Driver
     username: sa
     password: password
