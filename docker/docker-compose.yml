@@ -5,7 +5,7 @@ services:
     ports:
       - "4747:4747"
     volumes:
-      - ~/data:/data
+      - data:/data
 volumes:
   data:
     external: true
