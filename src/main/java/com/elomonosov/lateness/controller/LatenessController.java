@@ -40,7 +40,8 @@ public class LatenessController {
         String debtorName = getCorrectName(text, userName);
 
         SlackResponse response = new SlackResponse();
-        response.setText("Debt for " + debtorName + " is: " + latenessService.addDebt(debtorName, 500, userName).toString());
+        response.setResponseType(SlackResponse.ResponseType.IN_CHANNEL);
+        response.setText("A lateness for @" + debtorName + " has been added. The overall debt is: " + latenessService.addDebt(debtorName, 500, userName).toString());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -93,7 +94,8 @@ public class LatenessController {
             String debtorName = commands[0].substring(1);
             int value = Integer.parseInt(commands[1]);
             logger.info("user_name " + userName + "(" + userId + ") confirmed a tribute: user is " + debtorName + ", sum is " + value );
-            response.setText("Actual leftover debt for " + debtorName + " is: " + latenessService.payDebt(debtorName, value, userName).toString());
+            response.setResponseType(SlackResponse.ResponseType.IN_CHANNEL);
+            response.setText("A payment for @" + debtorName + " has been added. Actual leftover debt for is: " + latenessService.payDebt(debtorName, value, userName).toString());
         } else {
             response.setText("Not authorized");
         }
