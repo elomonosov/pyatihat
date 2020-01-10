@@ -154,7 +154,8 @@ public class LatenessController {
     private boolean isAuthorized(String userId) {
         logger.info("Checking " + userId);
         return (userId.equals("U9V6JA53P")) // Igor
-                || (userId.equals("UC7JD0PTK")); // Natasha
+                || (userId.equals("UC7JD0PTK")) // Natasha
+                || (userId.equals("UHTJ6H487")); // Evgenii
     }
 
     @RequestMapping(value = "/help",
@@ -165,11 +166,11 @@ public class LatenessController {
         SlackResponse response = new SlackResponse();
         response.setText("late @name\n" +
                 "если не указать @name, то пишет долг в 500 на отправителя, иначе на указанный username\n" +
-                "/tribute @name сумма\n" +
+                "/500_tribute @name сумма\n" +
                 "если не указать @name, то спишет платеж в указанную сумму у отправителя, иначе у указанного username\n" +
-                "/balance @name\n" +
+                "/500_balance @name\n" +
                 "если не указать @name, то выводит баланс отправителя, иначе баланс указанного username\n" +
-                "/shamehall\n" +
+                "/500_shamehall\n" +
                 "выводит список должников и сумм, сортированный по суммам\n" +
                 "/cancel @name сумма\n" +
                 "если не указать @name, то отменит начисление долга в указанную сумму у отправителя, иначе у указанного username\n" +
