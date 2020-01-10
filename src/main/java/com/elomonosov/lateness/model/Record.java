@@ -22,7 +22,8 @@ public class Record {
 
     public enum Type {
         DEBT(0),
-        PAYMENT(1);
+        PAYMENT(1),
+        CANCEL(2);
 
         private int code;
 

@@ -49,6 +49,10 @@ public class LatenessService {
                     sum = sum - record.getValue();
                     break;
                 }
+                case CANCEL: {
+                    sum = sum - record.getValue();
+                    break;
+                }
                 default: {
                     throw new IllegalStateException("Unknown type: " + record.getType());
                 }
@@ -85,6 +89,14 @@ public class LatenessService {
         orderByValue(result, new ComparableComparator<>());
 
         return result;
+    }
+
+    public Integer cancelDebt(String debtorName, int value, String reporter) {
+        return debtorRepository.findByName(debtorName)
+                .map(debtor -> {
+                    debtor.addRecord(value, Record.Type.CANCEL, reporter);
+                    return getDebtSum(debtor);
+                }).orElseThrow(() -> new IllegalStateException("debtorName " + debtorName + " not found"));
     }
 
     static <K, V> void orderByValue(

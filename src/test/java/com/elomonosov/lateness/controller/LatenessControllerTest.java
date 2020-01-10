@@ -210,4 +210,47 @@ class LatenessControllerTest {
         assertTrue(slackResponse1.getText().contains("petya=500"));
     }
 
+    @Test
+    void authorizedDebtDecrease() throws Exception {
+        String debtorName = "vasya";
+        Debtor debtor = new Debtor(debtorName);
+        debtor.addRecord(1000, Record.Type.DEBT, debtorName);
+        debtorRepository.save(debtor);
+
+        MvcResult mvcResult = mockMvc.perform(post(ROOT_ENDPOINT_URL + "/cancel")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .param("team_domain", debtorName)
+                .param("channel_id", debtorName)
+                .param("channel_name", debtorName)
+                .param("user_id", "UC7JD0PTK")
+                .param("user_name", "tasha090287")
+                .param("command", debtorName)
+                .param("text", "@" + debtorName + " " + "500")
+                .param("response_url", debtorName)
+        )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResult = mvcResult.getResponse().getContentAsString();
+        System.out.println("Response: " + jsonResult);
+        SlackResponse slackResponse1 = new ObjectMapper().readValue(jsonResult, SlackResponse.class);
+        assertTrue(slackResponse1.getText().endsWith("500"));
+        assertTrue(slackResponse1.getText().contains("decreased"));
+    }
+
+    @Test
+    void man() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(post(ROOT_ENDPOINT_URL + "/help")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .param("user_id", "UC7JD0PTK")
+                .param("user_name", "tasha090287")
+        )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResult = mvcResult.getResponse().getContentAsString();
+        System.out.println("Response: " + jsonResult);
+    }
+
 }

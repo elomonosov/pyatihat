@@ -93,9 +93,40 @@ public class LatenessController {
             }
             String debtorName = commands[0].substring(1);
             int value = Integer.parseInt(commands[1]);
-            logger.info("user_name " + userName + "(" + userId + ") confirmed a tribute: user is " + debtorName + ", sum is " + value );
+            logger.info("user_name " + userName + "(" + userId + ") confirmed a tribute: user is " + debtorName + ", sum is " + value);
             response.setResponseType(SlackResponse.ResponseType.IN_CHANNEL);
-            response.setText("A payment for @" + debtorName + " has been added. Actual leftover debt for is: " + latenessService.payDebt(debtorName, value, userName).toString());
+            response.setText("A payment has been added, sum is " + value + ". Actual leftover debt for for @" + debtorName + " is: " + latenessService.payDebt(debtorName, value, userName).toString());
+        } else {
+            response.setText("Not authorized");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/cancel",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<SlackResponse> cancelSum(@RequestParam("team_domain") String teamDomain,
+                                                   @RequestParam("channel_id") String channelId,
+                                                   @RequestParam("channel_name") String channelName,
+                                                   @RequestParam("user_id") String userId,
+                                                   @RequestParam("user_name") String userName,
+                                                   @RequestParam("command") String command,
+                                                   @RequestParam("text") String text,
+                                                   @RequestParam("response_url") String responseUrl) {
+        SlackResponse response = new SlackResponse();
+
+        if (isAuthorized(userId)) {
+            String[] commands = text.split(" ");
+            if (commands.length != 2) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            String debtorName = commands[0].substring(1);
+            int value = Integer.parseInt(commands[1]);
+            logger.info("user_name " + userName + "(" + userId + ") confirmed a cancel: " + debtorName + ", sum is " + value);
+            Integer leftover = latenessService.cancelDebt(debtorName, value, userName);
+            response.setResponseType(SlackResponse.ResponseType.IN_CHANNEL);
+            response.setText("A debt has been decreased by " + value + ". Actual leftover debt for for @" + debtorName + " is: " + leftover.toString());
+
         } else {
             response.setText("Not authorized");
         }
@@ -124,4 +155,28 @@ public class LatenessController {
         return (userId.equals("U9V6JA53P")) // Igor
                 || (userId.equals("UC7JD0PTK")); // Natasha
     }
+
+    @RequestMapping(value = "/help",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<SlackResponse> help() {
+
+        SlackResponse response = new SlackResponse();
+        response.setText("late @name\n" +
+                "если не указать @name, то пишет долг в 500 на отправителя, иначе на указанный username\n" +
+                "/tribute @name сумма\n" +
+                "если не указать @name, то спишет платеж в указанную сумму у отправителя, иначе у указанного username\n" +
+                "/balance @name\n" +
+                "если не указать @name, то выводит баланс отправителя, иначе баланс указанного username\n" +
+                "/shamehall\n" +
+                "выводит список должников и сумм, сортированный по суммам" +
+                "/cancel @name сумма\n" +
+                "если не указать @name, то отменит начисление долга в указанную сумму у отправителя, иначе у указанного username\n" +
+                "/500_man\n" +
+                "выведет справку по командам\n"
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
