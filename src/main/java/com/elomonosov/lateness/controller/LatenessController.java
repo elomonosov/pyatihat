@@ -152,6 +152,7 @@ public class LatenessController {
     }
 
     private boolean isAuthorized(String userId) {
+        logger.info("Checking " + userId);
         return (userId.equals("U9V6JA53P")) // Igor
                 || (userId.equals("UC7JD0PTK")); // Natasha
     }
@@ -169,7 +170,7 @@ public class LatenessController {
                 "/balance @name\n" +
                 "если не указать @name, то выводит баланс отправителя, иначе баланс указанного username\n" +
                 "/shamehall\n" +
-                "выводит список должников и сумм, сортированный по суммам" +
+                "выводит список должников и сумм, сортированный по суммам\n" +
                 "/cancel @name сумма\n" +
                 "если не указать @name, то отменит начисление долга в указанную сумму у отправителя, иначе у указанного username\n" +
                 "/500_man\n" +
