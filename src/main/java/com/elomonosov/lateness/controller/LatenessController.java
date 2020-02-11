@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping(value = "/lateness")
 public class LatenessController {
@@ -146,7 +148,9 @@ public class LatenessController {
                                                    @RequestParam("response_url") String responseUrl) {
 
         SlackResponse response = new SlackResponse();
-        response.setText("Overall result is " + latenessService.getBalance().toString());
+        Map<String, Integer> balance = latenessService.getBalance();
+        Integer sum = balance.values().stream().reduce(0, Integer::sum);
+        response.setText("Overall result is " + sum + ": \n + " + balance.toString());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -164,7 +168,7 @@ public class LatenessController {
     public ResponseEntity<SlackResponse> help() {
 
         SlackResponse response = new SlackResponse();
-        response.setText("late @name\n" +
+        response.setText("/500_late @name\n" +
                 "если не указать @name, то пишет долг в 500 на отправителя, иначе на указанный username\n" +
                 "/500_tribute @name сумма\n" +
                 "если не указать @name, то спишет платеж в указанную сумму у отправителя, иначе у указанного username\n" +
@@ -174,7 +178,7 @@ public class LatenessController {
                 "выводит список должников и сумм, сортированный по суммам\n" +
                 "/cancel @name сумма\n" +
                 "если не указать @name, то отменит начисление долга в указанную сумму у отправителя, иначе у указанного username\n" +
-                "/500_man\n" +
+                "/500_help\n" +
                 "выведет справку по командам\n"
         );
 
