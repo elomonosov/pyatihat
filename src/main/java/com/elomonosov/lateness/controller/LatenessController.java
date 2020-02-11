@@ -2,6 +2,7 @@ package com.elomonosov.lateness.controller;
 
 import com.elomonosov.lateness.model.SlackResponse;
 import com.elomonosov.lateness.service.LatenessService;
+import com.elomonosov.lateness.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/lateness")
@@ -22,8 +24,11 @@ public class LatenessController {
 
     private LatenessService latenessService;
 
-    public LatenessController(LatenessService latenessService) {
+    private UserService userService;
+
+    public LatenessController(LatenessService latenessService, UserService userService) {
         this.latenessService = latenessService;
+        this.userService = userService;
     }
 
     @RequestMapping(
@@ -62,7 +67,7 @@ public class LatenessController {
 
         String debtorName = getCorrectName(text, userName);
         SlackResponse response = new SlackResponse();
-        response.setText("Debt for " + debtorName + " is: " + latenessService.getDebt(debtorName).toString());
+        response.setText("Debt for " + userService.resolveLogin(debtorName) + " is: " + latenessService.getDebt(debtorName).toString());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -148,9 +153,17 @@ public class LatenessController {
                                                    @RequestParam("response_url") String responseUrl) {
 
         SlackResponse response = new SlackResponse();
+
         Map<String, Integer> balance = latenessService.getBalance();
         Integer sum = balance.values().stream().reduce(0, Integer::sum);
-        response.setText("Overall result is " + sum + ": \n + " + balance.toString());
+
+        String formattedBalance = balance
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        response.setText("Overall result is " + sum + ": " + System.lineSeparator() + formattedBalance);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

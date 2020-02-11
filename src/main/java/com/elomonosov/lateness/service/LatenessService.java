@@ -15,13 +15,15 @@ import java.util.*;
 @Transactional
 public class LatenessService {
 
-    public LatenessService(DebtorRepository debtorRepository) {
+    public LatenessService(DebtorRepository debtorRepository, UserService userService) {
         this.debtorRepository = debtorRepository;
+        this.userService = userService;
     }
 
     private final static Logger logger = LoggerFactory.getLogger(LatenessService.class);
 
     private DebtorRepository debtorRepository;
+    private UserService userService;
 
     public Integer addDebt(String debtorName, int value, String reporter) {
         return getDebtSum(debtorRepository.findByName(debtorName)
@@ -34,31 +36,6 @@ public class LatenessService {
                     return debtorRepository.save(debtor);
                 })
         );
-    }
-
-    private Integer getDebtSum(Debtor debtor) {
-
-        int sum = 0;
-        for (Record record : debtor.getRecordSet()) {
-            switch (record.getType()) {
-                case DEBT: {
-                    sum = sum + record.getValue();
-                    break;
-                }
-                case PAYMENT: {
-                    sum = sum - record.getValue();
-                    break;
-                }
-                case CANCEL: {
-                    sum = sum - record.getValue();
-                    break;
-                }
-                default: {
-                    throw new IllegalStateException("Unknown type: " + record.getType());
-                }
-            }
-        }
-        return sum;
     }
 
     public Integer getDebt(String debtorName) {
@@ -84,7 +61,14 @@ public class LatenessService {
         LinkedHashMap<String, Integer> result = new LinkedHashMap<>();
 
         debtorRepository.findAll()
-                .forEach(debtor -> result.put(debtor.getName(), getDebtSum(debtor)));
+                .forEach(debtor -> {
+                    Integer sum = getDebtSum(debtor);
+                    if (!sum.equals(0)) {
+                        result.put(
+                                userService.resolveLogin(debtor.getName()),
+                                sum);
+                    }
+                });
 
         orderByValue(result, new ComparableComparator<>());
 
@@ -106,5 +90,27 @@ public class LatenessService {
         entries.stream()
                 .sorted(Comparator.comparing(Map.Entry::getValue, c.reversed()))
                 .forEachOrdered(e -> m.put(e.getKey(), e.getValue()));
+    }
+
+    private Integer getDebtSum(Debtor debtor) {
+
+        int sum = 0;
+        for (Record record : debtor.getRecordSet()) {
+            switch (record.getType()) {
+                case DEBT: {
+                    sum = sum + record.getValue();
+                    break;
+                }
+                case PAYMENT:
+                case CANCEL: {
+                    sum = sum - record.getValue();
+                    break;
+                }
+                default: {
+                    throw new IllegalStateException("Unknown type: " + record.getType());
+                }
+            }
+        }
+        return sum;
     }
 }

@@ -1,6 +1,6 @@
 CREATE TABLE debtors
 (
-    id   INT auto_increment PRIMARY KEY,
+    id   INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(250) NOT NULL
 );
 

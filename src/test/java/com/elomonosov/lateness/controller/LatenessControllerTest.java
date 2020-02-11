@@ -205,9 +205,9 @@ class LatenessControllerTest {
         String jsonResult = mvcResult.getResponse().getContentAsString();
         System.out.println("Response: " + jsonResult);
         SlackResponse slackResponse1 = new ObjectMapper().readValue(jsonResult, SlackResponse.class);
-        assertTrue(slackResponse1.getText().contains("kolya=2000"));
-        assertTrue(slackResponse1.getText().contains("vasya=1000"));
-        assertTrue(slackResponse1.getText().contains("petya=500"));
+        assertTrue(slackResponse1.getText().contains("kolya: 2000"));
+        assertTrue(slackResponse1.getText().contains("vasya: 1000"));
+        assertTrue(slackResponse1.getText().contains("petya: 500"));
     }
 
     @Test
