@@ -26,4 +26,11 @@ public class UserService {
                 }})
                 .getName();
     }
+
+    public User createUser(String login, String name) {
+        User user = new User();
+        user.setName(name);
+        user.setLogin(login);
+        return userRepository.save(user);
+    }
 }

@@ -1,6 +1,7 @@
 package com.elomonosov.lateness.controller;
 
 import com.elomonosov.lateness.model.SlackResponse;
+import com.elomonosov.lateness.model.User;
 import com.elomonosov.lateness.service.LatenessService;
 import com.elomonosov.lateness.service.UserService;
 import org.slf4j.Logger;
@@ -8,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -196,6 +194,20 @@ public class LatenessController {
         );
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/user",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> createUser(@RequestBody User user,
+                                           @RequestHeader(name = "auth", required = false) String auth) {
+        if ((auth != null) && (auth.equals("ololo"))) {
+            return new ResponseEntity<>(userService.createUser(user.getLogin(), user.getName()), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
     }
 
 }

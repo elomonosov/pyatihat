@@ -4,6 +4,7 @@ import com.elomonosov.lateness.LatenessApplication;
 import com.elomonosov.lateness.model.Debtor;
 import com.elomonosov.lateness.model.Record;
 import com.elomonosov.lateness.model.SlackResponse;
+import com.elomonosov.lateness.model.User;
 import com.elomonosov.lateness.repository.DebtorRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -247,6 +248,47 @@ class LatenessControllerTest {
                 .param("user_name", "tasha090287")
         )
                 .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResult = mvcResult.getResponse().getContentAsString();
+        System.out.println("Response: " + jsonResult);
+    }
+
+    @Test
+    void createUser() throws Exception {
+
+        User user = new User();
+        user.setName("Vasyan");
+        user.setLogin("vas");
+
+        String requestBody = new ObjectMapper().writeValueAsString(user);
+
+        MvcResult mvcResult = mockMvc.perform(post(ROOT_ENDPOINT_URL + "/user")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody)
+                .header("auth", "ololo")
+        )
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResult = mvcResult.getResponse().getContentAsString();
+        System.out.println("Response: " + jsonResult);
+    }
+
+    @Test
+    void createUserForbidden() throws Exception {
+
+        User user = new User();
+        user.setName("Kostayn");
+        user.setLogin("kos");
+
+        String requestBody = new ObjectMapper().writeValueAsString(user);
+
+        MvcResult mvcResult = mockMvc.perform(post(ROOT_ENDPOINT_URL + "/user")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody)
+        )
+                .andExpect(status().isForbidden())
                 .andReturn();
 
         String jsonResult = mvcResult.getResponse().getContentAsString();
